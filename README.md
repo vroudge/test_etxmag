@@ -19,7 +19,7 @@ Open http://localhost:3000 with your browser to access the web app.
 ## What you'll have to do
 Clients want to organise their own content. They have audio files which they want to upload and organise into programs. They also want to be able to edit and delete their content.
 
-You will have to create the endpoints to manage medias and programs. You can find the models in the `api` package, in the `entities` folder. Here are the features you'll need to implement:
+You will have to create the endpoints to manage medias and programs. You will find the models for each entity along in the sections below.
 
 #### Medias
 A media has a name, a file, a duration, and a description.
