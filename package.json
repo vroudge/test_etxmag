@@ -1,0 +1,26 @@
+{
+  "name": "node-technical-test",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "author": "Andréas Pinbouen <andreas.pinbouen@majelan.audio>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "tsc-watch --onSuccess \"node ./dist/index.js\""
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.3.0",
+    "@fastify/swagger": "^8.10.0",
+    "@fastify/swagger-ui": "^1.9.3",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.23.1",
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.2.2"
+  }
+}

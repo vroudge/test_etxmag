@@ -1,0 +1,15 @@
+services:
+  database:
+    image: mysql
+    environment:
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=server
+      - MYSQL_PASSWORD=staging
+      - MYSQL_ROOT_PASSWORD=devRO0T
+    ports:
+      - "3306:3306"
+    container_name: majelan_test_mysql
+    volumes:
+      - mysql-data:/data/db
+volumes:
+  mysql-data:
