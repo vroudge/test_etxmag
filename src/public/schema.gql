@@ -1,0 +1,96 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""An object with an ID"""
+interface Node {
+  """The ID of the object"""
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+type Media implements Node {
+  """The ID of the object"""
+  id: ID!
+
+  """The name of the media"""
+  name: String!
+
+  """The location of the media file"""
+  fileLocation: String!
+
+  """The duration of the media in seconds"""
+  duration: Float!
+
+  """The description of the media"""
+  description: String!
+  program: ProgramGraphqlConnection
+}
+
+type ProgramGraphql implements Node {
+  """The ID of the object"""
+  id: ID!
+
+  """The name of the media"""
+  name: String!
+
+  """The location of the media file"""
+  coverImageLocation: String!
+
+  """The description of the media"""
+  description: String!
+}
+
+type ProgramGraphqlEdge {
+  node: ProgramGraphql
+  cursor: String!
+}
+
+type ProgramGraphqlConnection {
+  edges: [ProgramGraphqlEdge]
+  pageInfo: PageInfo!
+}
+
+type Query {
+  medias: [Media!]!
+
+  """Fetches an object given its ID"""
+  node(
+    """The ID of an object"""
+    id: ID!
+  ): Node
+
+  """Fetches objects given their IDs"""
+  nodes(
+    """The IDs of objects"""
+    ids: [ID!]!
+  ): [Node]!
+}
+
+type Mutation {
+  upsertMedia(input: UpsertMediaInput!): Media!
+  deleteMedia: Boolean!
+}
+
+input UpsertMediaInput {
+  """The name of the media"""
+  id: String
+
+  """The name of the media"""
+  name: String!
+
+  """The location of the media file"""
+  fileLocation: String!
+
+  """The duration of the media in seconds"""
+  duration: Float!
+
+  """The description of the media"""
+  description: String!
+}
