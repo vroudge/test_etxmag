@@ -1,4 +1,4 @@
-import { Resolver } from '@nestjs/graphql'
+import { Field, InputType, Resolver, Int, ArgsType } from '@nestjs/graphql'
 import {
   NodeFieldResolver,
   NodeInterface,
@@ -9,6 +9,16 @@ import { ResolvedNode } from 'nestjs-relay/dist/cjs/global-object-identification
 import { Media } from '../program-creation/media/graphql/media.object'
 import { ProgramService } from '../program-creation/program/infrastructure/program.service'
 import { Program } from '../program-creation/program/graphql/program.object'
+
+@InputType()
+@ArgsType()
+export class PaginationArgs {
+  @Field(() => Int, { nullable: true })
+  public limit?: number
+
+  @Field(() => Int, { nullable: true })
+  public offset?: number
+}
 
 @Resolver(NodeInterface)
 export class NodeResolver extends NodeFieldResolver {

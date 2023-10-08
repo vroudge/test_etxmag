@@ -18,7 +18,4 @@ export class Program extends NodeInterface {
 
   @Field(() => String, { description: 'The description of the media' })
   public description: string
-
-  @Field(() => [Media], { description: 'The medias in the program' })
-  public medias: Media[]
 }

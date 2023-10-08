@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { FindManyOptions, In, Repository } from 'typeorm'
+import { FindManyOptions, FindOptionsOrderValue, In, Repository } from 'typeorm'
 import { ProgramService } from '../../program/infrastructure/program.service'
 import { Media } from './media.entity'
 import { Program } from '../../program/infrastructure/program.entity'
+import { LimitOffset, TypeOrmLimitOffset } from '../../../lib/util'
 
 export interface FindMediasFilters {
   ids?: string[]
@@ -19,6 +20,9 @@ export interface MediaUpsertDTO {
 }
 
 @Injectable()
+/**
+ * Service for interacting with media
+ */
 export class MediaService {
   constructor(
     @InjectRepository(Media)
@@ -37,13 +41,20 @@ export class MediaService {
   /**
    * Given a set of filters, finds the relevant media
    * @param filters
+   * @param pagination
    */
-  async findMedias(filters?: FindMediasFilters): Promise<Media[]> {
+  async findMedias(
+    filters: FindMediasFilters = {},
+    pagination: LimitOffset = {},
+  ): Promise<Media[]> {
     const query: FindManyOptions<Media> = {}
 
     if (filters?.ids?.length) {
       query.where = { ...query.where, id: In(filters.ids) }
     }
+
+    query.take = pagination.limit
+    query.skip = pagination.offset
 
     return this.mediaRepository.find(query)
   }
@@ -57,15 +68,41 @@ export class MediaService {
     // TODO this really needs a DTO class
     if (media.id) {
       await this.mediaRepository.findOneOrFail({ where: { id: media.id } })
-      return this.mediaRepository.save(media)
-    } else {
-      return this.mediaRepository.save({
-        ...media,
-      })
     }
+    return this.mediaRepository.save({
+      ...media,
+      ...(media?.programId && { program: { id: media.programId } }),
+    })
   }
 
-  public async getMediaProgram(id: string) {
-    return Promise.resolve(undefined)
+  /**
+   * Get the parent program of a given media
+   * @param id
+   */
+  public async getMediaProgram(id: string): Promise<Program | null> {
+    const media: Media = await this.findMedia(id)
+    return media?.programId
+      ? await this.programService.findProgram(media?.programId)
+      : null
+  }
+
+  /**
+   * Given a media id, deletes the relevant media
+   * @param id
+   */
+  async deleteMedia(id: string) {
+    console.log(id)
+    return this.mediaRepository.delete({ id })
+  }
+
+  public async findMediasByProgram(id: string, { limit, offset }: LimitOffset) {
+    const query = {
+      order: { createdAt: 'DESC' as FindOptionsOrderValue },
+      where: { program: { id } },
+      take: limit,
+      skip: offset,
+    }
+
+    return this.mediaRepository.find(query)
   }
 }

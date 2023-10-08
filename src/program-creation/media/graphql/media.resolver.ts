@@ -10,8 +10,10 @@ import {
 import { Media } from './media.object'
 import { MediaService } from '../infrastructure/media.service'
 import { Program } from '../../program/graphql/program.object'
-import { GlobalIdFieldResolver, ResolveConnectionField } from 'nestjs-relay'
-import { Inject } from '@nestjs/common'
+import { GlobalIdFieldResolver, ResolvedGlobalId } from 'nestjs-relay'
+import { connectionFromArray } from 'graphql-relay/connection/arrayConnection'
+import { PaginationArgs } from '../../../lib/node.resolver'
+import { describe } from 'node:test'
 
 @InputType()
 class UpsertMediaInput {
@@ -31,27 +33,43 @@ class UpsertMediaInput {
   public description: string
 }
 
+@InputType()
+class FindMediasFilters {
+  @Field(() => [String], {
+    nullable: true,
+    description: "The id's of the medias",
+  })
+  public ids?: string[]
+}
+
 @Resolver(() => Media)
 export class MediaResolver extends GlobalIdFieldResolver(Media) {
   constructor(protected mediaService: MediaService) {
     super()
   }
-  @Query(() => [Media])
-  async medias(): Promise<Media[]> {
-    const medias = await this.mediaService.findMedias()
+  @Query(() => [Media], { description: 'Find all medias' })
+  async medias(
+    @Args('filters', { nullable: true }) filters: FindMediasFilters,
+    @Args('pagination', { nullable: true }) pagination: PaginationArgs,
+  ): Promise<Media[]> {
+    const medias = await this.mediaService.findMedias(filters, pagination)
 
     return medias as unknown as Media[]
   }
 
-  @Mutation(() => Media)
+  @Mutation(() => Media, { description: 'Upsert a media' })
   async upsertMedia(@Args('input') input: UpsertMediaInput) {
     return this.mediaService.upsertMedia(input)
   }
 
-  @Mutation(() => Boolean)
-  async deleteMedia() {}
+  @Mutation(() => Boolean, { description: 'Delete a media' })
+  async deleteMedia(@Args('id') id: ResolvedGlobalId) {
+    await this.mediaService.deleteMedia(id.toString())
 
-  @ResolveField(() => Program)
+    return true
+  }
+
+  @ResolveField(() => Program, { nullable: true })
   async program(root: Media) {
     return this.mediaService.getMediaProgram(root.id.toString())
   }

@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql'
 import { NodeInterface, NodeType } from 'nestjs-relay'
+import { Program } from '../../program/graphql/program.object'
 
 @NodeType()
 export class Media extends NodeInterface {

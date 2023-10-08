@@ -1,19 +1,35 @@
-import { Args, Field, InputType, Mutation, Resolver } from '@nestjs/graphql'
+import {
+  Args,
+  ArgsType,
+  Field,
+  InputType,
+  Mutation,
+  Parent,
+  Query,
+  Resolver,
+} from '@nestjs/graphql'
 import { Program } from './program.object'
-import { GlobalIdFieldResolver, ResolveConnectionField } from 'nestjs-relay'
+import {
+  Connection,
+  GlobalIdFieldResolver,
+  ResolveConnectionField,
+  ResolvedGlobalId,
+} from 'nestjs-relay'
 import { Media } from '../../media/graphql/media.object'
 import { ProgramService } from '../infrastructure/program.service'
-import { Arg } from 'type-graphql'
-import { Inject } from '@nestjs/common'
 import { MediaService } from '../../media/infrastructure/media.service'
+import { PaginationArgs } from '../../../lib/node.resolver'
+import { connectionFromArray } from 'graphql-relay/connection/arrayConnection'
 
 @InputType()
 class SetMediasInProgramInput {
-  @Field(() => String, { description: 'The id of the program' })
-  public programId: string
+  @Field(() => ResolvedGlobalId, { description: 'The id of the program' })
+  public programId: ResolvedGlobalId
 
-  @Field(() => String, { description: 'The id of the medias in the program' })
-  public mediaIds: string[]
+  @Field(() => [ResolvedGlobalId], {
+    description: 'The id of the medias in the program',
+  })
+  public mediaIds: ResolvedGlobalId[]
 }
 
 @InputType()
@@ -28,34 +44,72 @@ class UpsertProgramInput {
   description: string
 }
 
-@Resolver(() => Program)
+@InputType()
+class FindProgramsFilters {
+  @Field(() => [ResolvedGlobalId], { nullable: true })
+  public ids?: ResolvedGlobalId[]
+}
+
+@Resolver(Program)
 export class ProgramResolver extends GlobalIdFieldResolver(Program) {
   constructor(
-    @Inject(ProgramService) protected readonly programService: ProgramService,
+    protected readonly programService: ProgramService,
+    protected readonly mediaService: MediaService,
   ) {
     super()
   }
-  @Field(() => [Program])
-  async programs(): Promise<Program[]> {
-    return []
+  @Query(() => [Program], { nullable: true })
+  async programs(
+    @Args('input', { nullable: true }) input: FindProgramsFilters = {},
+    @Args('pagination', { nullable: true }) pagination: PaginationArgs = {},
+  ): Promise<Program[]> {
+    const programs = await this.programService.findPrograms(
+      {
+        ids: input.ids?.map((e) => e.id),
+      },
+      pagination,
+    )
+
+    return programs.map(
+      (program) => new Program(program as any as Program),
+    ) as Program[]
   }
 
-  @Mutation(() => Media)
-  async upsertMedia(@Args('input') input: UpsertProgramInput) {
+  @Mutation(() => Program)
+  async upsertProgram(@Args('input') input: UpsertProgramInput) {
     return this.programService.upsertProgram(input)
   }
 
   @Mutation(() => Program)
   public async setMediasInProgram(
-    @Arg('input') input: SetMediasInProgramInput,
+    @Args('input') input: SetMediasInProgramInput,
   ): Promise<Program> {
-    const program = await this.programService.setMediasInProgram(input)
-
+    const program = await this.programService.setMediasInProgram({
+      programId: input.programId.id,
+      mediaIds: input.mediaIds.map((e) => e.id),
+    })
     return new Program(program as unknown as Program)
+  }
+
+  @Mutation(() => Boolean)
+  async deleteProgram(@Args('id') id: ResolvedGlobalId) {
+    await this.programService.deleteProgram(id.toString())
+
+    return true
   }
 
   @ResolveConnectionField(() => Media, {
     description: 'The medias in the program',
   })
-  async medias() {}
+  public async medias(
+    @Parent() root: Program,
+    @Args('pagination', { nullable: true }) pagination: PaginationArgs = {},
+  ): Promise<Connection<Media>> {
+    const medias = await this.mediaService.findMediasByProgram(
+      root.id.toString(),
+      pagination,
+    )
+
+    return connectionFromArray(medias as any as Media[], {})
+  }
 }

@@ -30,7 +30,7 @@ type Media implements Node {
 
   """The description of the media"""
   description: String!
-  program: Program!
+  program: Program
 }
 
 type Program implements Node {
@@ -47,12 +47,22 @@ type Program implements Node {
   description: String!
 
   """The medias in the program"""
-  medias: [Media!]!
+  medias(pagination: PaginationArgs): MediaConnection
+}
+
+input PaginationArgs {
+  limit: Int
+  offset: Int
 }
 
 type MediaEdge {
   node: Media
   cursor: String!
+}
+
+type MediaConnection {
+  edges: [MediaEdge]
+  pageInfo: PageInfo!
 }
 
 type Query {
@@ -67,13 +77,50 @@ type Query {
     """The IDs of objects"""
     ids: [ID!]!
   ): [Node]!
-  medias: [Media!]!
+  programs(input: FindProgramsFilters, pagination: PaginationArgs): [Program!]
+
+  """Find all medias"""
+  medias(filters: FindMediasFilters, pagination: PaginationArgs): [Media!]!
+}
+
+input FindProgramsFilters {
+  ids: [ID!]
+}
+
+input FindMediasFilters {
+  """The id's of the medias"""
+  ids: [String!]
 }
 
 type Mutation {
+  upsertProgram(input: UpsertProgramInput!): Program!
+  setMediasInProgram(input: SetMediasInProgramInput!): Program!
+  deleteProgram(id: ID!): Boolean!
+
+  """Upsert a media"""
   upsertMedia(input: UpsertMediaInput!): Media!
-  setMediasInProgram: Program!
-  deleteMedia: Boolean!
+
+  """Delete a media"""
+  deleteMedia(id: ID!): Boolean!
+}
+
+input UpsertProgramInput {
+  """The name of the media"""
+  name: String
+
+  """The location of the media file"""
+  coverImageLocation: String!
+
+  """The description of the media"""
+  description: String!
+}
+
+input SetMediasInProgramInput {
+  """The id of the program"""
+  programId: ID!
+
+  """The id of the medias in the program"""
+  mediaIds: [ID!]!
 }
 
 input UpsertMediaInput {

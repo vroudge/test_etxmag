@@ -31,6 +31,8 @@ export class Media {
   @ManyToOne(() => Program, (program) => program.medias)
   public program!: Program
 
+  public programId?: string
+
   @CreateDateColumn()
   public createdAt!: Date
 

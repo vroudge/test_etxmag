@@ -12,7 +12,7 @@ import { Media } from '../../media/infrastructure/media.entity'
 
 @Entity()
 export class Program {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   public id!: string
 
   @Column()

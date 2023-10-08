@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { FindManyOptions, In, Repository } from 'typeorm'
 import { Program } from './program.entity'
 import { MediaService } from '../../media/infrastructure/media.service'
+import { LimitOffset } from '../../../lib/util'
 
 export interface FindProgramsQueryFilters {
   ids?: string[]
@@ -30,13 +31,20 @@ export class ProgramService {
   /**
    * Given a set of filters, finds the relevant programs
    * @param filters
+   * @param pagination
    */
-  async findPrograms(filters?: FindProgramsQueryFilters): Promise<Program[]> {
+  async findPrograms(
+    filters: FindProgramsQueryFilters = {},
+    pagination: LimitOffset,
+  ): Promise<Program[]> {
     const query: FindManyOptions<Program> = {}
 
     if (filters?.ids?.length) {
       query.where = { ...query.where, id: In(filters.ids) }
     }
+
+    query.take = pagination.limit
+    query.skip = pagination.offset
 
     return this.programRepository.find(query)
   }
@@ -84,5 +92,9 @@ export class ProgramService {
     )
 
     return this.programRepository.findOneOrFail({ where: { id: programId } })
+  }
+
+  public async deleteProgram(id: string) {
+    return this.programRepository.delete({ id })
   }
 }
