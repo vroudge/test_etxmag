@@ -4,14 +4,17 @@ import {
   NodeInterface,
   ResolvedGlobalId,
 } from 'nestjs-relay'
-import { MediaService } from '../media/infrastructure/media.repo'
+import { MediaService } from '../program-creation/media/infrastructure/media.service'
 import { ResolvedNode } from 'nestjs-relay/dist/cjs/global-object-identification/node'
-import { Media } from '../media/graphql/media.object'
+import { Media } from '../program-creation/media/graphql/media.object'
+import { ProgramService } from '../program-creation/program/infrastructure/program.service'
+import { Program } from '../program-creation/program/graphql/program.object'
 
 @Resolver(NodeInterface)
 export class NodeResolver extends NodeFieldResolver {
   constructor(
     protected mediaService: MediaService, // protected program: ProgramService,
+    protected programService: ProgramService, // protected program: ProgramService,
   ) {
     super()
   }
@@ -30,7 +33,12 @@ export class NodeResolver extends NodeFieldResolver {
         const media = await this.mediaService.findMedia(
           resolvedGlobalId.toString(),
         )
-        return media ? new Media(media as unknown as any) : null
+        return media ? new Media(media as any as Media) : null
+      case 'Program':
+        const program = await this.programService.findProgram(
+          resolvedGlobalId.toString(),
+        )
+        return program ? new Program(program as any as Program) : null
       default:
         return null
     }

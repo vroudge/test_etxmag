@@ -1,17 +1,30 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Media } from './media.entity'
 import { FindManyOptions, In, Repository } from 'typeorm'
-import { generateGlobalId } from '../../lib/utils'
+import { ProgramService } from '../../program/infrastructure/program.service'
+import { Media } from './media.entity'
+import { Program } from '../../program/infrastructure/program.entity'
 
-export interface FindMedias {
+export interface FindMediasFilters {
   ids?: string[]
+}
+
+export interface MediaUpsertDTO {
+  id?: string
+  name?: string
+  fileLocation?: string
+  duration?: number
+  description?: string
+  programId?: string
 }
 
 @Injectable()
 export class MediaService {
   constructor(
-    @InjectRepository(Media) protected mediaRepository: Repository<Media>,
+    @InjectRepository(Media)
+    protected readonly mediaRepository: Repository<Media>,
+    @Inject(ProgramService)
+    protected readonly programService: ProgramService,
   ) {}
 
   /**
@@ -25,7 +38,7 @@ export class MediaService {
    * Given a set of filters, finds the relevant media
    * @param filters
    */
-  async findMedias(filters?: FindMedias): Promise<Media[]> {
+  async findMedias(filters?: FindMediasFilters): Promise<Media[]> {
     const query: FindManyOptions<Media> = {}
 
     if (filters?.ids?.length) {
@@ -40,15 +53,19 @@ export class MediaService {
    * otherwise inserts a new media
    * @param media
    */
-  async upsertMedia(media: Partial<Media>) {
+  async upsertMedia(media: MediaUpsertDTO): Promise<Media> {
+    // TODO this really needs a DTO class
     if (media.id) {
       await this.mediaRepository.findOneOrFail({ where: { id: media.id } })
       return this.mediaRepository.save(media)
     } else {
-      // const id = generateGlobalId('Media')
       return this.mediaRepository.save({
         ...media,
       })
     }
+  }
+
+  public async getMediaProgram(id: string) {
+    return Promise.resolve(undefined)
   }
 }

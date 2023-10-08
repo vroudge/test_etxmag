@@ -2,13 +2,11 @@ import { Module } from '@nestjs/common'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { GraphQLModule } from '@nestjs/graphql'
 import { join } from 'path'
-import { MediaModule } from './media/media.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Media } from './media/infrastructure/media.entity'
-import { Program } from './program/infrastructure/program.entity'
-import { GlobalIdScalar } from 'nestjs-relay'
-import { NodeResolver } from './lib/node.resolver'
+import { Media } from './program-creation/media/infrastructure/media.entity'
 import { LibModule } from './lib/lib.module'
+import { ProgramCreationModule } from './program-creation/program.module'
+import { Program } from './program-creation/program/infrastructure/program.entity'
 
 @Module({
   imports: [
@@ -34,8 +32,8 @@ import { LibModule } from './lib/lib.module'
       entities: [Media, Program],
       synchronize: true,
     }),
-    MediaModule,
     LibModule,
+    ProgramCreationModule,
   ],
   exports: [],
   controllers: [],

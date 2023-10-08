@@ -30,10 +30,10 @@ type Media implements Node {
 
   """The description of the media"""
   description: String!
-  program: ProgramGraphqlConnection
+  program: Program!
 }
 
-type ProgramGraphql implements Node {
+type Program implements Node {
   """The ID of the object"""
   id: ID!
 
@@ -45,21 +45,17 @@ type ProgramGraphql implements Node {
 
   """The description of the media"""
   description: String!
+
+  """The medias in the program"""
+  medias: [Media!]!
 }
 
-type ProgramGraphqlEdge {
-  node: ProgramGraphql
+type MediaEdge {
+  node: Media
   cursor: String!
 }
 
-type ProgramGraphqlConnection {
-  edges: [ProgramGraphqlEdge]
-  pageInfo: PageInfo!
-}
-
 type Query {
-  medias: [Media!]!
-
   """Fetches an object given its ID"""
   node(
     """The ID of an object"""
@@ -71,10 +67,12 @@ type Query {
     """The IDs of objects"""
     ids: [ID!]!
   ): [Node]!
+  medias: [Media!]!
 }
 
 type Mutation {
   upsertMedia(input: UpsertMediaInput!): Media!
+  setMediasInProgram: Program!
   deleteMedia: Boolean!
 }
 

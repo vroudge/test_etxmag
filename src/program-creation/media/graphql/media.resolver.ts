@@ -8,9 +8,10 @@ import {
   Field,
 } from '@nestjs/graphql'
 import { Media } from './media.object'
-import { MediaService } from '../infrastructure/media.repo'
-import { ProgramGraphql } from '../../program/adapters/graphql/program.object'
+import { MediaService } from '../infrastructure/media.service'
+import { Program } from '../../program/graphql/program.object'
 import { GlobalIdFieldResolver, ResolveConnectionField } from 'nestjs-relay'
+import { Inject } from '@nestjs/common'
 
 @InputType()
 class UpsertMediaInput {
@@ -50,6 +51,8 @@ export class MediaResolver extends GlobalIdFieldResolver(Media) {
   @Mutation(() => Boolean)
   async deleteMedia() {}
 
-  @ResolveConnectionField(() => ProgramGraphql)
-  async program() {}
+  @ResolveField(() => Program)
+  async program(root: Media) {
+    return this.mediaService.getMediaProgram(root.id.toString())
+  }
 }
