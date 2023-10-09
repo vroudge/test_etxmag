@@ -60,7 +60,7 @@ export class MediaResolver extends GlobalIdFieldResolver(Media) {
     return medias as unknown as Media[]
   }
 
-  @Mutation(() => Media, { description: 'Upsert a media' })
+  @Mutation(() => Media, { description: 'Upsert a media o' })
   async upsertMedia(@Args('input') input: UpsertMediaInput) {
     return this.mediaService.upsertMedia({
       ...input,
@@ -75,7 +75,10 @@ export class MediaResolver extends GlobalIdFieldResolver(Media) {
     return true
   }
 
-  @ResolveField(() => Program, { nullable: true })
+  @ResolveField(() => Program, {
+    nullable: true,
+    description: 'The program the media belongs to',
+  })
   async program(root: Media) {
     return this.mediaService.getMediaProgram(root.id.toString())
   }

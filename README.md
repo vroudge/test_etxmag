@@ -22,11 +22,14 @@ I figured I might be able to show you something more interesting ; and more ente
 
 Some things I've done that I'm quite proud of:
 - A global object ID dealt with at resolve time, meaning any object in the application has a unique ID and can be queried by it via a single endpoint, relay-style!
+- Good two-way resolvers, meaning the program can be found from a given media and the other way around.
+- A smart way to order medias in a program using self-referencing.
 
 What I didn't take the time to do, because I guessed it wouldn't be that interesting to you:
 
+- a nice domain-error layer. Typeorm and GraphQL both output meaningful errors (most of the time) so that should be enough for now.
 - An endpoint to remove medias from a program. I figured it would be the same logic as adding a media to a program, but in reverse. Feels unecessary to show-off but I'd be happy to do it if you want me to.
-- Clean DTOs. My output types are sometimes a bit messy in the Graphql resolvers but I'd rather fit the spec than take too much time writing DTOs.
+- Clean DTOs. My output types are sometimes a bit messy in the Graphql resolvers but I'd rather fit the spec than take too much time on something I feel is trivial.
 - Super in-depth documentation. I've written a few comments here and there but I didn't take the time to write a full documentation. I'm not sure it's necessary for a technical test, but I'd be happy to tell you everything over a call.
 - The migrations utils. I've set the database to synchronize on app-startup so migrations run every time. 
 

@@ -89,20 +89,26 @@ export class ProgramService {
     const foundMedias = await Promise.all(
       mediaIds.map(async (mediaId) => this.mediaService.findMedia(mediaId)),
     )
-
     if (foundMedias.length !== mediaIds.length) {
       throw new Error('Not all medias were found') // TODO be more specific + build domain error layer
     }
 
-    await Promise.all(
-      foundMedias.map(
-        async (media) =>
-          await this.mediaService.upsertMedia({
-            id: media.id,
-            programId,
-          }),
-      ),
-    )
+    // to manage the ordering of medias in a given, they self-reference between themselves
+    // which is an efficient tidbit to manage their positions between themselves
+    let previousMediaId: string | undefined = undefined
+    // first we reverse the array so we can persist the last media in the chain first
+    for (const media of foundMedias.reverse()) {
+      await this.mediaService.upsertMedia({
+        id: media.id,
+        programId,
+        beforeMediaId: previousMediaId,
+      })
+      previousMediaId = media.id
+    }
+
+    //id 1 before 2
+    //id 2 before 3
+    //id 3 before null
 
     return this.programRepository.findOneOrFail({ where: { id: programId } })
   }

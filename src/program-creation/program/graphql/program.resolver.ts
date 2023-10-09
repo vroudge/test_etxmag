@@ -94,7 +94,9 @@ export class ProgramResolver extends GlobalIdFieldResolver(Program) {
     })
   }
 
-  @Mutation(() => Program, { description: 'Set medias in a program' })
+  @Mutation(() => Program, {
+    description: 'Set medias in a program in the order provided',
+  })
   public async setMediasInProgram(
     @Args('input') input: SetMediasInProgramInput,
   ): Promise<Program> {

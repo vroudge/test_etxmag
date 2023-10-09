@@ -10,8 +10,6 @@ import { Repository } from 'typeorm'
 import { medias, programs } from './fixtures'
 import { Media } from '../program-creation/media/infrastructure/media.entity'
 import { afterEach, beforeEach, expect } from '@jest/globals'
-import { before } from 'node:test'
-import exp from 'constants'
 
 const toGlobalId = (type: string, id: string) => {
   return Buffer.from(`${type}:${id}`).toString('base64')
@@ -37,8 +35,7 @@ describe('App', () => {
     await app.getHttpAdapter().getInstance().ready()
   })
   beforeEach(async () => {
-    // TODO never do this it's soooo slow
-    // instead mock at the repository level
+    // TODO never do this it's soooo slow instead mock at the repository level
     await programRepository.save(programs)
     await mediaRepository.save(medias)
   })
@@ -317,92 +314,7 @@ describe('App', () => {
       })
     })
 
-    it('Removes medias from a program', async () => {
-      const media1 = await mediaRepository.save({
-        id: 'test-1',
-        name: 'Media 1',
-        duration: 10,
-        fileLocation: 'fileLocation1',
-        description: 'description1',
-      })
-      const media2 = await mediaRepository.save({
-        id: 'test-2',
-        name: 'Media 2',
-        duration: 20,
-        fileLocation: 'fileLocation2',
-        description: 'description2',
-      })
-      const program = await programRepository.save({
-        id: 'test-1',
-        name: 'Program 1',
-        coverImageLocation: 'coverImageLocation',
-        description: 'description',
-      })
-
-      const mutation = `
-        mutation {
-          setMediasInProgram(
-            input: {
-              programId: "${toGlobalId('Program', program.id)}"
-              mediaIds: ["${toGlobalId('Media', media1.id)}", "${toGlobalId(
-                'Media',
-                media2.id,
-              )}"]
-            }
-          ) {
-            id
-            name
-            medias {
-              edges {
-                node {
-                  id
-                  name
-                  fileLocation
-                  duration
-                  description
-                }
-              }
-            }
-          }
-        }
-      `
-
-      const response = await request(app.getHttpServer())
-        .post('/graphql')
-        .send({ query: mutation })
-
-      expect(response.status).toBe(200)
-      expect(response.body).toMatchObject({
-        data: {
-          setMediasInProgram: {
-            id: expect.any(String),
-            name: expect.any(String),
-            medias: {
-              edges: [
-                {
-                  node: {
-                    id: expect.any(String),
-                    name: expect.any(String),
-                    fileLocation: expect.any(String),
-                    duration: expect.any(Number),
-                    description: expect.any(String),
-                  },
-                },
-                {
-                  node: {
-                    id: expect.any(String),
-                    name: expect.any(String),
-                    fileLocation: expect.any(String),
-                    duration: expect.any(Number),
-                    description: expect.any(String),
-                  },
-                },
-              ],
-            },
-          },
-        },
-      })
-    })
+    it.todo('Removes medias from a program')
 
     it('Edit a media', async () => {
       const media = await mediaRepository.save({

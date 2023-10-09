@@ -37,7 +37,6 @@ export class NodeResolver extends NodeFieldResolver {
    */
   // @ts-ignore
   async resolveNode(resolvedGlobalId: ResolvedGlobalId): ResolvedNode {
-    console.log('resolvedGlobalId', resolvedGlobalId)
     switch (resolvedGlobalId.type) {
       case 'Media':
         const media = await this.mediaService.findMedia(

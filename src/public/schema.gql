@@ -30,6 +30,8 @@ type Media implements Node {
 
   """The description of the media"""
   description: String!
+
+  """The program the media belongs to"""
   program: Program
 }
 
@@ -77,6 +79,8 @@ type Query {
     """The IDs of objects"""
     ids: [ID!]!
   ): [Node]!
+
+  """Find all programs"""
   programs(input: FindProgramsFilters, pagination: PaginationArgs): [Program!]
 
   """Find all medias"""
@@ -93,11 +97,16 @@ input FindMediasFilters {
 }
 
 type Mutation {
+  """Upsert a program"""
   upsertProgram(input: UpsertProgramInput!): Program!
+
+  """Set medias in a program in the order provided"""
   setMediasInProgram(input: SetMediasInProgramInput!): Program!
+
+  """Delete a program"""
   deleteProgram(id: ID!): Boolean!
 
-  """Upsert a media"""
+  """Upsert a media o"""
   upsertMedia(input: UpsertMediaInput!): Media!
 
   """Delete a media"""
@@ -108,13 +117,13 @@ input UpsertProgramInput {
   """The name of the media"""
   id: ID
 
-  """The name of the media"""
+  """The name of the program"""
   name: String
 
-  """The location of the media file"""
+  """The location of the program cover image"""
   coverImageLocation: String!
 
-  """The description of the media"""
+  """The description of the program"""
   description: String!
 }
 
