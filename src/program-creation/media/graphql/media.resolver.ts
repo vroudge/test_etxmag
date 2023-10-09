@@ -17,8 +17,11 @@ import { describe } from 'node:test'
 
 @InputType()
 class UpsertMediaInput {
-  @Field(() => String, { nullable: true, description: 'The name of the media' })
-  public id: string
+  @Field(() => ResolvedGlobalId, {
+    nullable: true,
+    description: 'The name of the media',
+  })
+  public id: ResolvedGlobalId
 
   @Field(() => String, { description: 'The name of the media' })
   public name: string
@@ -59,12 +62,15 @@ export class MediaResolver extends GlobalIdFieldResolver(Media) {
 
   @Mutation(() => Media, { description: 'Upsert a media' })
   async upsertMedia(@Args('input') input: UpsertMediaInput) {
-    return this.mediaService.upsertMedia(input)
+    return this.mediaService.upsertMedia({
+      ...input,
+      id: input?.id?.id?.toString(),
+    })
   }
 
   @Mutation(() => Boolean, { description: 'Delete a media' })
   async deleteMedia(@Args('id') id: ResolvedGlobalId) {
-    await this.mediaService.deleteMedia(id.toString())
+    await this.mediaService.deleteMedia(id.id.toString())
 
     return true
   }

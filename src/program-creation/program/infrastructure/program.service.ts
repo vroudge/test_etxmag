@@ -10,13 +10,21 @@ export interface FindProgramsQueryFilters {
 }
 
 @Injectable()
+/**
+ * Service for interacting with programs
+ */
 export class ProgramService {
   constructor(
     @InjectRepository(Program)
     protected readonly programRepository: Repository<Program>,
-    @Inject(forwardRef(() => MediaService))
+    @Inject(forwardRef(() => MediaService)) // Circular references are messy, thanks nest
     protected readonly mediaService: MediaService,
   ) {}
+
+  /**
+   * Given a program id, finds the relevant program
+   * @param id
+   */
   async findProgram(id: string): Promise<Program> {
     return this.programRepository.findOneOrFail({ where: { id } })
   }
@@ -65,6 +73,11 @@ export class ProgramService {
     }
   }
 
+  /**
+   * Given a program id, sets the medias in the program
+   * @param programId
+   * @param mediaIds
+   */
   async setMediasInProgram({
     programId,
     mediaIds,
@@ -94,6 +107,10 @@ export class ProgramService {
     return this.programRepository.findOneOrFail({ where: { id: programId } })
   }
 
+  /**
+   * Given a program id, deletes the relevant program
+   * @param id
+   */
   public async deleteProgram(id: string) {
     return this.programRepository.delete({ id })
   }

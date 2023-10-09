@@ -34,13 +34,24 @@ class SetMediasInProgramInput {
 
 @InputType()
 class UpsertProgramInput {
-  @Field(() => String, { nullable: true, description: 'The name of the media' })
+  @Field(() => ResolvedGlobalId, {
+    nullable: true,
+    description: 'The name of the media',
+  })
+  id: ResolvedGlobalId
+
+  @Field(() => String, {
+    nullable: true,
+    description: 'The name of the program',
+  })
   name: string
 
-  @Field(() => String, { description: 'The location of the media file' })
+  @Field(() => String, {
+    description: 'The location of the program cover image',
+  })
   coverImageLocation: string
 
-  @Field(() => String, { description: 'The description of the media' })
+  @Field(() => String, { description: 'The description of the program' })
   description: string
 }
 
@@ -58,7 +69,7 @@ export class ProgramResolver extends GlobalIdFieldResolver(Program) {
   ) {
     super()
   }
-  @Query(() => [Program], { nullable: true })
+  @Query(() => [Program], { nullable: true, description: 'Find all programs' })
   async programs(
     @Args('input', { nullable: true }) input: FindProgramsFilters = {},
     @Args('pagination', { nullable: true }) pagination: PaginationArgs = {},
@@ -75,12 +86,15 @@ export class ProgramResolver extends GlobalIdFieldResolver(Program) {
     ) as Program[]
   }
 
-  @Mutation(() => Program)
+  @Mutation(() => Program, { description: 'Upsert a program' })
   async upsertProgram(@Args('input') input: UpsertProgramInput) {
-    return this.programService.upsertProgram(input)
+    return this.programService.upsertProgram({
+      ...input,
+      id: input?.id?.id?.toString(),
+    })
   }
 
-  @Mutation(() => Program)
+  @Mutation(() => Program, { description: 'Set medias in a program' })
   public async setMediasInProgram(
     @Args('input') input: SetMediasInProgramInput,
   ): Promise<Program> {
@@ -91,9 +105,9 @@ export class ProgramResolver extends GlobalIdFieldResolver(Program) {
     return new Program(program as unknown as Program)
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Boolean, { description: 'Delete a program' })
   async deleteProgram(@Args('id') id: ResolvedGlobalId) {
-    await this.programService.deleteProgram(id.toString())
+    await this.programService.deleteProgram(id.id.toString())
 
     return true
   }

@@ -20,9 +20,12 @@ I figured I might be able to show you something more interesting ; and more ente
 - then navigate to `http://localhost:8080/graphql` to access the graphql interface.
 - You can check the docs there for the endpoints, plus test my queries as you wish.
 
+Some things I've done that I'm quite proud of:
+- A global object ID dealt with at resolve time, meaning any object in the application has a unique ID and can be queried by it via a single endpoint, relay-style!
+
 What I didn't take the time to do, because I guessed it wouldn't be that interesting to you:
 
-- Tests. I've hand-tested pretty much everything through the interface. It's all a bit messy, unperfect, but it works. It'd probably take me a few hours to write the tests. If you wonder whether I can write tests, I can show you some of my work.
+- An endpoint to remove medias from a program. I figured it would be the same logic as adding a media to a program, but in reverse. Feels unecessary to show-off but I'd be happy to do it if you want me to.
 - Clean DTOs. My output types are sometimes a bit messy in the Graphql resolvers but I'd rather fit the spec than take too much time writing DTOs.
 - Super in-depth documentation. I've written a few comments here and there but I didn't take the time to write a full documentation. I'm not sure it's necessary for a technical test, but I'd be happy to tell you everything over a call.
 - The migrations utils. I've set the database to synchronize on app-startup so migrations run every time. 

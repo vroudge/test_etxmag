@@ -106,6 +106,9 @@ type Mutation {
 
 input UpsertProgramInput {
   """The name of the media"""
+  id: ID
+
+  """The name of the media"""
   name: String
 
   """The location of the media file"""
@@ -125,7 +128,7 @@ input SetMediasInProgramInput {
 
 input UpsertMediaInput {
   """The name of the media"""
-  id: String
+  id: ID
 
   """The name of the media"""
   name: String!
